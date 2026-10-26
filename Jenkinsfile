@@ -10,24 +10,29 @@ pipeline {
                 echo 'Skipping heavy build for simple python script...'
             }
         }
+        
         stage('SonarQube Quality Scan') {
             steps {
                 echo 'Scanning Code with SonarQube...'
                 // A lightweight containerized sonar-scanner
+                // Make sure to replace YOUR_TOKEN_HERE with your actual SonarQube token!
                 sh '''
                 docker run --rm -e SONAR_HOST_URL="http://172.17.0.1:9000" \
                 -v "${WORKSPACE}:/usr/src" sonarsource/sonar-scanner-cli \
                 -Dsonar.projectKey=my-python-app \
-                -Dsonar.sources=.
+                -Dsonar.sources=. \
+                -Dsonar.token=YOUR_TOKEN_HERE
                 '''
             }
         }
+        
         stage('Docker Build') {
             steps {
                 echo 'Building Docker Image...'
                 sh "docker build -t ${DOCKER_IMAGE}:latest ."
             }
         }
+        
         stage('Trivy Security Scan') {
             steps {
                 echo 'Scanning Docker Image for Vulnerabilities...'
@@ -35,6 +40,7 @@ pipeline {
                 sh "trivy image --no-progress ${DOCKER_IMAGE}:latest"
             }
         }
+        
         stage('Deploy Application') {
             steps {
                 echo 'Deploying application as a Docker container...'
