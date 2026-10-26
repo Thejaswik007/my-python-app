@@ -14,14 +14,12 @@ pipeline {
         stage('SonarQube Quality Scan') {
             steps {
                 echo 'Scanning Code with SonarQube...'
-                // A lightweight containerized sonar-scanner
-                // Make sure to replace YOUR_TOKEN_HERE with your actual SonarQube token!
                 sh '''
                 docker run --rm -e SONAR_HOST_URL="http://172.17.0.1:9000" \
                 -v "${WORKSPACE}:/usr/src" sonarsource/sonar-scanner-cli \
                 -Dsonar.projectKey=my-python-app \
                 -Dsonar.sources=. \
-                -Dsonar.token=squ_053199b8865382baedaa0c47e30a52296cf3772d
+                -Dsonar.login=squ_053199b8865382baedaa0c47e30a52296cf3772d
                 '''
             }
         }
